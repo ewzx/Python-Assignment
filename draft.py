@@ -16,7 +16,7 @@ def login():
             for line in f: #to read the lines in the file
                 global gu
                 global gp
-                gu, gp, c = line.strip().split(",") #u, p, c = username, password, clearance; .rstrip is to remove \n on line 87; .split is to split the three data in txt file
+                gu, gp, c = line.strip().split(":") #u, p, c = username, password, clearance; .rstrip is to remove \n on line 87; .split is to split the three data in txt file
                 if username == gu and password == gp: #check if the user's input is the same in the csv file
                     print("Login Successfully!\n")
                     if c == "a": #check user's clearance in csv file
@@ -38,7 +38,7 @@ def readlist(txt):
     userlist = [] #establish a list
     with open(f"{txt}.txt", "r") as f:
         for line in f: #for loop, every line in the file
-            x = line.strip().split(",") #getting the information
+            x = line.strip().split(":") #getting the information
             userlist.append(x) #adding it to the list
     return userlist #return the list
 
@@ -46,7 +46,7 @@ def alrdexist(item):
     exist = 0
     with open("userdata.txt") as f:
         for line in f:
-            u, p, c = line.strip().split(",")
+            u, p, c = line.strip().split(":")
             if item == u and c != "te": #checking if the username is already taken while also checking if it is a trainee
                 exist = 1 #marking it as previously existed
                 return 2 #returning the info
@@ -60,7 +60,7 @@ def write(list, txt):
     cnt = 0
     with open(f"{txt}.txt", "w") as f:
         for cnt in range(len(list)):
-            combine = ",".join(list[cnt]) + "\n"
+            combine = ":".join(list[cnt]) + "\n"
             f.write(combine)
     return list
 
@@ -307,7 +307,7 @@ def receptionist():
 
                         with open("trainprogram.txt") as f:
                             for line in f:
-                                user, p, *_ = line.strip().split(",")
+                                user, p, *_ = line.strip().split(":")
                                 if username == user and p == program:
                                     print(f"{username} Has Already Enrolled In This Training Program.")
                                     enroll = True
