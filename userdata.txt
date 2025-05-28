@@ -1,0 +1,7 @@
+admin,admin123,a
+receptionist,recept123,r
+trainee,trainee123,te
+steve,steve123,te
+ryan,ryan123,te
+katie,katie123,te
+maya,maya123,te
