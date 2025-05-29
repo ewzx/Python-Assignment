@@ -1,0 +1,5 @@
+admin123:badminton
+coach2:badminton
+coach9:swimming
+coach:swimming
+c5:basketball

@@ -1,0 +1,7 @@
+admin:admin123:Adam:a
+receptionist:recept123:Ron:r
+trainee:trainee123:te
+steve:steve123:Steve:te
+ryan:ryan123:Ryan:te
+katie:katie123:Katie:te
+maya:maya123:Maya:te

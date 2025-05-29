@@ -1,0 +1,7 @@
+steve:Climbing:0:100
+ryan:Football:50:100
+steve:Hiking:10:100
+katie:Trekking:30:100
+steve:Soccer:50:100
+steve:Trekking:20:100
+maya:Climbing:0:100
