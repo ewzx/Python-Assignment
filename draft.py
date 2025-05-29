@@ -1,3 +1,134 @@
+from datetime import datetime
+import os
+
+#-----------------------Ng Ginny-------------------------
+# Log access for successful login
+def log_access(username, role):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open("access_log.txt", "a") as f:
+        f.write(f"{timestamp} - {username} - {role}\n")
+
+def view_access_log():
+    print("\n--- Login Access Log ---")
+    try:
+        with open("access_log.txt", "r") as f:
+            logs = f.readlines()
+            if not logs:
+                print("No login records found.")
+            else:
+                for line in logs:
+                    print(line.strip())
+    except FileNotFoundError:
+        print("Access log file not found.")
+
+# User Registration
+def register_user(clearance_code):
+    username = input("Enter username: ")
+    password = input("Enter password: ")
+    name = input("Enter name: ")
+    with open("userdata.txt", "a") as f:
+        f.write(f"{username}:{password}:{name}:{clearance_code}\n")
+    print("Registered Successfully.")
+
+# Delete User
+def delete_user(role_code):
+    username = input("Enter the username to delete: ")
+    found = False
+    lines = []
+    with open("userdata.txt", "r") as f:
+        for line in f:
+            u, p, name, c = line.rstrip().split(":")
+            if u == username and c == role_code:
+                found = True
+                continue
+            lines.append(line)
+    if found:
+        with open("pyp", "w") as f:
+            for l in lines:
+                f.write(l)
+        print(f"{username} deleted successfully.")
+    else:
+        print("User not found or role mismatch.")
+
+# Coach-Sport Assignment
+def assign_coach_sport():
+    coach = input("Enter coach username: ")
+    sport = input("Enter sport to assign: ")
+    with open("coach_sport.txt", "a") as f:
+        f.write(f"{coach}:{sport}\n")
+    print(f"{coach} assigned to {sport}.")
+
+# Income Report
+def view_income_report():
+    total_income = 0
+    incomes = []
+
+    with open("income_report.txt", "r") as f:
+        print(f"{'Sport':<15} {'Income':>15}")
+        print("-" * 30)
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+
+            parts = line.split(":")
+            if len(parts) == 2:
+                sport, amount = parts
+                try:
+                    amount_float = float(amount.replace(",", ""))
+                    incomes.append((sport, amount_float))
+                    total_income += amount_float
+                    formatted_amount = f"RM{amount_float:,.2f}"
+                    print(f"{sport:<15} {formatted_amount:>15}")
+                except ValueError:
+                    print(f"Invalid amount for sport: {sport}")
+        print("-" * 30)
+        formatted_total = f"RM{total_income:,.2f}"
+        print(f"{'Total Income:':<15} {formatted_total:>15}")
+
+# User Records
+def ReadFileData(AllRec):
+    AllRec.clear()
+    try:
+        with open('userdata.txt', 'r') as fh:
+            for line in fh:
+                listRec = line.strip().split(':')
+                if len(listRec) == 4:
+                    AllRec.append(listRec)
+    except FileNotFoundError:
+        pass
+
+def SaveData(AllUsers):
+    with open('userdata.txt', 'w') as fh:
+        for record in AllUsers:
+            recstr = ':'.join(record) + '\n'
+            fh.write(recstr)
+
+def SearchModify(AllRec, username):
+    found = False
+    for cnt in range(len(AllRec)):
+        if AllRec[cnt][0] == username:
+            found = True
+            print('UserID:', AllRec[cnt][0])
+            print('User Name:', AllRec[cnt][2])
+            print('User Password:', AllRec[cnt][1])
+            newPassword = input('Enter a New Password: ')
+            AllRec[cnt][1] = newPassword
+            SaveData(AllRec)
+            print('\nProfile Updated.\n')
+            break
+    if not found:
+        print("User not found in records.")
+
+# Update own profile
+def update_own_profile(username):
+    AllUsers = []
+    ReadFileData(AllUsers)
+    SearchModify(AllUsers, username)
+#--------------------------------------------------------
+
+
+#-------------------Wong Zhen Xuan-----------------------
 def login():
     t = 3 #login attemps
     login = 1 #to check if they had logined previously
@@ -16,21 +147,12 @@ def login():
             for line in f: #to read the lines in the file
                 global gu
                 global gp
-                gu, gp, c = line.strip().split(":") #u, p, c = username, password, clearance; .rstrip is to remove \n on line 87; .split is to split the three data in txt file
+                global gname
+                gu, gp, gname, c = line.strip().split(":") #u, p, c = username, password, clearance; .rstrip is to remove \n on line 87; .split is to split the three data in txt file
                 if username == gu and password == gp: #check if the user's input is the same in the csv file
                     print("Login Successfully!\n")
-                    if c == "a": #check user's clearance in csv file
-                        admin() #call def admin()
-                        exit()
-                    elif c == "r":
-                        receptionist() #call def receptionist()
-                        exit()
-                    elif c == "c":
-                        coach() #call def coach()
-                        exit()
-                    elif c == "te":
-                        trainee() #call def trainee()
-                        exit()
+                    log_access(username, c)
+                    return c, username
             t -= 1 #they have wrongly inputted user n password
             login = 0 #they have inputted user n password previously
 
@@ -203,13 +325,63 @@ def infochange(list, old, new, txt):
 
     list = write(list, txt)
     return list
+#--------------------------------------------------------
 
+#-----------------------Ng Ginny-------------------------
 def admin():
-    print("admin")
+    AllUsers = []
+    ReadFileData(AllUsers)
+    while True:
+        print('''
+Admin Menu:
+1. Register Coach
+2. Delete Coach
+3. Assign Coach to Sport
+4. Register Receptionist
+5. Delete Receptionist
+6. View Income Report
+7. Save Data
+8. Update Own Profile
+9. View Login Access Log
+10. Exit to Main Menu
+''')
+        choice = input('Select Your Choice: ')
+        if choice == '1':
+            register_user('c')
+            ReadFileData(AllUsers)
+        elif choice == '2':
+            delete_user('c')
+            ReadFileData(AllUsers)
+        elif choice == '3':
+            assign_coach_sport()
+        elif choice == '4':
+            register_user('r')
+            ReadFileData(AllUsers)
+        elif choice == '5':
+            delete_user('r')
+            ReadFileData(AllUsers)
+        elif choice == '6':
+            view_income_report()
+        elif choice == '7':
+            SaveData(AllUsers)
+            print("Data Saved.")
+        elif choice == '8':
+            username = input("Enter your admin username: ")
+            update_own_profile(username)
+            ReadFileData(AllUsers)
+        elif choice == '9':
+            view_access_log()
+        elif choice == '10':
+            break
+        else:
+            print("Invalid choice.")
+#--------------------------------------------------------
 
+
+#-------------------Wong Zhen Xuan-----------------------
 def receptionist():
     while True:
-        print(f"Welcome, {gu.title()}.")
+        print(f"Welcome, {gname.title()}.")
         print('''
     1. Register & Enroll A Trainee
     2. Enroll A Trainee
@@ -252,7 +424,7 @@ def receptionist():
                         break
 
                     program = input("What Program Would You Like To Enroll?: ").strip().title()
-                    name = input("Please Enter Your Name: ")
+                    name = input("Please Enter Your Name: ").title()
                     ic = input("Please Enter Your IC/Passport Number: ")
                     email = input("Please Enter Your Email Address: ")
                     contact = input("Please Enter Your Contact Number: ")
@@ -269,7 +441,7 @@ def receptionist():
                         regis = True
 
                     elif check == "Y":
-                        newdata = [username, password, "te"]
+                        newdata = [username, password, name, "te"]
                         datalist.append(newdata)
                         write(datalist, "userdata") #register new user to userdata.txt
 
@@ -518,6 +690,7 @@ Total Paid: RM {userlist[amt][2]}/RM {userlist[amt][3]}
         elif action == 7:
             changeinfo = True
             print(f"Username: {gu}")
+            print(f"Name:     {gname}")
             print(f"Password: {gp}")
 
             while changeinfo:
@@ -530,6 +703,12 @@ Total Paid: RM {userlist[amt][2]}/RM {userlist[amt][3]}
                 elif choice == "Username":
                     newu = input("Please Enter Your New Username: ")
                     datalist = infochange(datalist, gu, newu, "userdata")
+                    print("Updated Successfully!")
+                    changeinfo = False
+
+                elif choice == "Name":
+                    newname = input("Please Enter Your New Name: ")
+                    datalist = infochange(datalist, gname, newname, "userdata")
                     print("Updated Successfully!")
                     changeinfo = False
                 
@@ -548,16 +727,59 @@ Total Paid: RM {userlist[amt][2]}/RM {userlist[amt][3]}
             break
 
         elif action == 0:
+            print("\nLogout Successfully!")
+            print("Exiting Program.")
             break
 
         else:
             print("Invalid Action, Please Try Again.")
+#--------------------------------------------------------
 
+
+#--------------------------------------------------------
 def coach():
     print("coach")
+#--------------------------------------------------------
 
+
+#--------------------------------------------------------
 def trainee():
     print("trainee")
+#--------------------------------------------------------
 
-import datetime
-login() #call def main()
+
+# Main Program Loop
+def main():
+    while True:
+        print('''
+1. Login
+0. Exit
+''')
+        action = input("Select Your Action: ")
+        if not action.isdigit():
+            print("Invalid input. Try again.")
+            continue
+        action = int(action)
+
+        if action == 1:
+            clearance, username = login()
+            if clearance == "a":
+                admin()
+                exit()
+            elif clearance == "r":
+                receptionist()
+                exit()
+            elif clearance == "c":
+                coach()
+                exit()
+            elif clearance == "te":
+                traineeMenu()
+                exit()
+
+        elif action == 0:
+            print("Exiting program.")
+            exit()
+        else:
+            print("Invalid choice.")
+
+main() #call def main()
