@@ -286,6 +286,7 @@ def update(list, user, x):
                         cnt += 1
                     print("\nUpdated Successfully!\n")
                     return list
+                    
             elif confirm == "N":
                 loop = False
             else:
@@ -315,7 +316,6 @@ def update(list, user, x):
                 return 0
             else:
                 print("Invalid Input, Please Try Again.")
-                break
 
 def infochange(list, old, new, txt):
     for row in range(len(list)):
@@ -383,16 +383,16 @@ def receptionist():
     while True:
         print(f"Welcome, {gname.title()}.")
         print('''
-    1. Register & Enroll A Trainee
-    2. Enroll A Trainee
-    3. View Pending Requests
-    4. Update Trainee's Training Program
-    5. Accept Payment
-    6. Delete Trainee/Trainee's Training Program
-    7. Change Account Information
-    9. Logout
-    0. Logout & Exit
-    ''')
+1. Register & Enroll A Trainee
+2. Enroll A Trainee
+3. View Pending Requests
+4. Update Trainee's Training Program
+5. Accept Payment
+6. Delete Trainee/Trainee's Training Program
+7. Change Account Information
+9. Logout
+0. Logout & Exit
+''')
         
         try: #to check the class(integer, str, etc.) of action
             action = int(input("What would you like to do?: "))
