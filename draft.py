@@ -742,9 +742,98 @@ def coach():
 #--------------------------------------------------------
 
 
-#--------------------------------------------------------
-def trainee():
-    print("trainee")
+#-------------------------Stuart-------------------------
+def trainee(username):
+    while True:
+        with open("userdata.txt", "r") as f:
+            u = p = name = c = ""
+            for line in f:
+                u, p, name, c = line.rstrip().split(":")
+                if u == username: #Matching Data to Username
+                    break
+            print(f"Welcome Trainee {name}.")
+            print('''
+            1. Training Schedule
+            2. Payment
+            3. Help Desk
+            4. Update Own Profile
+            5. Logout
+            ''')
+            choice = input('What would you like to do?:').title()
+
+            with open("trainprogram.txt", "r") as x: #TrainProgram
+                u = program = amtpaid = amtdue = ""
+                for line in x:
+                    u, program, amtpaid, amtdue = line.rstrip().split(":")
+                    if u == username:  # Matching Data to Username
+                        break
+                if choice == '1': #View Program
+                    print(f"{program}")
+
+                elif choice == '2': #Payment
+                    if amtdue==0:
+                        print(f"Nothing Due")
+                    elif amtdue<0: #Error Testing
+                        print(f"ERROR")
+                    else:
+                        print(f"Payments Due {amtdue}")
+                        print(f"Paid Amount {amtpaid}")
+
+                elif choice == '3': #Request
+                    cnt = 0
+                    print (f"What is your issue?")
+                    print('''
+                    1. Change Training Program
+                    2. View Request
+                    3. Back to Main Menu
+                    ''')
+                    choice_exit = input().title()
+                    with open("pendingreq.txt", "a") as p:  # New Request
+                        u = program = new_program = ""
+                        for line in p:
+                            u, program, new_program = line.rstrip().split(":")
+                            if u == username:  # Matching Data to Username
+                                break
+                        if choice_exit == '1':
+                            p.write(f"{u}:{program}:{new_program}\n")
+                            print(f"Request Sent Successfully")
+                            cnt += 1
+                        elif choice_exit == '2': #View Request
+                            if cnt > 0:
+                                print(f"You Have {cnt} Pending Request(s).")
+                                with open("pendingreq.txt", "w") as p: #Overwrite/Delete Request
+                                    for line in f:
+                                        if username not in line.strip("\n"):  # Checks if the user is in the string
+                                            f.write(line)
+                            elif cnt < 0: #Error Testing
+                                print(f"ERROR")
+                            else:
+                                print(f"No Pending Request(s)")
+
+                        elif choice_exit == '3':
+                            break
+                        else:
+                            print (f"Invalid Input, Please Try Again.")
+
+                elif choice == '4': #Profile Update
+                        update_own_profile(u)
+
+                elif choice == '5': #Back to login
+                    print (f"Are you sure?") #DoubleChecking
+                    print('''
+                    1. Yes
+                    2. No
+                    ''')
+                    choice_exit = input().title()
+                    if choice_exit == '1':
+                        print("\nLogout Successfully!")
+                        login()
+                    elif choice_exit == '2':
+                        break
+                    else:
+                        print("Invalid Input, Please Try Again.")
+                else:
+                    print("Invalid choice.")
 #--------------------------------------------------------
 
 
@@ -773,7 +862,7 @@ def main():
                 coach()
                 exit()
             elif clearance == "te":
-                traineeMenu()
+                trainee(username)
                 exit()
 
         elif action == 0:
