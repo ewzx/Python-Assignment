@@ -1,0 +1,5 @@
+coach001_T000001,coach001,basketball1,80RM,Sat8-10am
+coach002_T000002,coach002,badminton1,100RM,Mon6-8pm
+coach004_T000003,coach004,volleyball1,100RM,Wed6-10pm
+coach004_T000004,coach004,volleyball2,80RM,Sat3-5pm
+coach003_T000005,coach002,swimming1,80RM,Sun3-5pm
