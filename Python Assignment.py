@@ -128,228 +128,6 @@ def update_own_profile(username):
 #--------------------------------------------------------
 
 
-#----------------------Huang Yixuan----------------------
-#load coaches' information from coaches.txt
-def load_coaches():
-    try:
-        with open("coaches.txt","r") as fh :
-            return[line.strip().split(",") for line in fh if line.strip()]
-    except FileNotFoundError:
-        return[]
-
-#save information to coaches.txt
-def save_coaches(coaches):
-    print("Saving coach information to file...")
-    with open("coaches.txt","w") as fh:
-        for coach in coaches:
-            fh.write(",".join(coach)+"\n")
-
-#load training information
-def load_trainings():
-    print("Loading training information...")
-    try:
-        with open("trainings.txt","r") as fh :
-            return[line.strip().split(",") for line in fh if line.strip()]
-    except FileNotFoundError:
-        return[]
-
-#save to trainings.txt
-def save_trainings(trainings):
-    print("Saving training information to file...")
-    with open("trainings.txt","w") as fh:
-        for training in trainings:
-            fh.write(",".join(training)+"\n")
-
-#save but contain original data
-def add_training_to_file(new_training):
-    trainings = load_trainings()
-    trainings.append(new_training)
-    save_trainings(trainings)
-
-#log in
-def coach_login():
-    print("Please log in.")
-    coaches = load_coaches()
-    attempts = 3
-    while attempts > 0 :
-        username = input("Please enter your username: ")
-        password = input("Please enter your password: ")
-        for coach in coaches:
-            if coach[0] == username and coach[1] == password:
-                print(f"Login successfully! Welcome back, {coach[2]}! ")
-                return coach
-        attempts -= 1
-        print(f"Login failure. The remaining attempt is : {attempts} ")
-    print("You have no attempt to login! ")
-    return None
-
-#add training courses
-def add_training(coach_username):
-    print("Adding training course...")
-    trainings = load_trainings()
-    training_name = input("Please enter the course name: ")
-    charges = input("Please enter the course charges: ")
-    schedule = input("Please enter the course schedule: ")
-    #identification: course name + coach name
-    training_id = f"{coach_username}_{training_name}"
-    new_training = [training_id, coach_username, training_name, charges, schedule]
-    add_training_to_file(new_training)
-    print("Add the course successfully! ")
-
-#update the course
-def update_training():
-    print("Ready to update the course...")
-    trainings = load_trainings()
-    course_name = input("Please enter the course name which you want to update: ")
-    found = False
-    for i, training in enumerate(trainings):   #enumerate(sequence, [start=0])
-        if training[2] == course_name:
-            print(f"Now the course information is: {training}")
-            training[2] = input("New course name: ") or training[2]
-            training[3] = input("New charge: ") or training[3]
-            training[4] = input("New schedule: ") or training[4]
-            trainings[i] = training
-            save_trainings(trainings)
-            print("Successfully update!")
-            found = True
-            break
-    if not found:
-            print("Course not found.")
-
-#delete course
-def delete_training():
-    print("Ready to delete the course...")
-    trainings = load_trainings()
-    training_id = input("Please enter the course id which you want to delete: ")
-    for i, training in enumerate(trainings):
-        if training[0] == training_id:
-            del trainings[i]      #delete [i] in traings
-            save_trainings(trainings)
-            print("Successfully delete! ")
-            return
-    print("Course not found.")
-
-#to see the trainee's information
-def view_enrolled_trainees():
-    try:
-        with open("traineedetails.txt", "r") as fh:
-            trainees = [line.strip().split(",") for line in fh if line.strip()]
-        with open("trainprogram.txt","r") as fh:
-            programs = [line.strip().split(",") for line in fh if line.strip()]
-    except FileNotFoundError:
-        print("Trainee file not found.")
-        return
-    trainee_courses_list = []
-    for program in programs:
-        trainee_name = program[0].lower()
-        course_name = program[1]
-        trainee_courses_list.append((trainee_name, course_name))
-    if not trainees:
-        print("Trainee data not found.")
-        return
-    print("\n=== INFORMATION OF ALL TRAINEES ===")
-    print("Trainee name\tContact number\t\tIC\t\tCourse")
-    print("-"*100)
-    for trainee in trainees:
-        trainee_name = trainee[1].lower()
-        trainee_ic = trainee[2]
-        trainee_contact = trainee[4]
-        courses = []
-        for t in trainee_courses_list:
-            if t[0] == trainee_name and t[1] not in courses:
-                courses.append(t[1])
-        unique_courses = []
-        for course in courses:
-            if course not in unique_courses:
-                unique_courses.append(course)
-        unique_courses.sort()
-        course_str = ", ".join(unique_courses) if unique_courses else "none"
-        print(trainee_name,"\t",trainee_contact,"\t",trainee_ic,"\t",course_str)
-
-#update own information
-def update_profile(coach):
-    print("Updating your information...")
-    coaches = load_coaches()
-    index = coaches.index(coach)
-    print("Current information: ",coach)
-    coach[0] = input("New username: ") or coach[0]
-    coach[1] = input("New password: ") or coach[1]
-    coach[2] = input("New name: " ) or coach[2]
-    coach[3] = input("New contact email: ") or coach[3]
-    coach[index] = coach
-    save_coaches(coaches)
-    print("Update successfully.")
-
-#view all course data
-def view_all_trainings():
-    trainings = load_trainings()
-    if not trainings:
-        print("There is no training course now.")
-    print("\n=== COURSE INFORMATION ===")
-    print("Training id\t\t\tCoach\t\tCourse name\t\tCharge\tSchedule")
-    print("-"*100)
-    for training in trainings:
-        print(training[0], "\t", training[1], "\t", training[2], "\t", training[3], "\t", training[4])
-
-#coach menu
-def coach_main_menu(coach):
-    while True:
-        print("\n=== COACH MENU ===")
-        print("1. Add training course")
-        print("2. Update training course")
-        print("3. Delete training course")
-        print("4. View trainees list")
-        print("5. Update own profile")
-        print("6. View all the course")
-        print("7, Log out")
-        choice = input("Select the action: ")
-        if choice == "1":
-            add_training(coach[0])
-        elif choice == "2":
-            update_training()
-        elif choice == "3":
-            delete_training()
-        elif choice == "4":
-            view_enrolled_trainees()
-        elif choice == "5":
-            update_profile(coach)
-        elif choice == "6":
-            view_all_trainings()
-        elif choice == "7":
-            print("Logging out...")
-            return
-        else:
-            print("Action can not work. Please choose again.")
-    while True:
-        print("\n=== COACH MENU ===")
-        print("1. Add training course")
-        print("2. Update training course")
-        print("3. Delete training course")
-        print("4. View trainees list")
-        print("5. Update own profile")
-        print("6. View all the course")
-        print("7, Log out")
-        choice = input("Select the action: ")
-        if choice == "1":
-            add_training(coach[0])
-        elif choice == "2":
-            update_training()
-        elif choice == "3":
-            delete_training()
-        elif choice == "4":
-            view_enrolled_trainees()
-        elif choice == "5":
-            update_profile(coach)
-        elif choice == "6":
-            view_all_trainings()
-        elif choice == "7":
-            print("Logging out...")
-            return
-        else:
-            print("Action can not work. Please choose again.")
-#--------------------------------------------------------
-
-
 #-------------------Wong Zhen Xuan-----------------------
 def login():
     t = 3 #login attemps
@@ -478,6 +256,7 @@ def update(list, user, x):
                         if new == "0":
                             actionzero = True
                             break
+                        break
 
                 elif x == 4 and exist == 1:
                     confirmtxt = f"\n{user}'s {action} Program Will Be \033[1mDELETED\033[0m, Confirm? (Y/N): "
@@ -485,9 +264,9 @@ def update(list, user, x):
         loop = True
         while loop:
             cnt = 0
-            confirm = input(f"{confirmtxt}").capitalize()
+            confirm = input(f"{confirmtxt}").title()
             if confirm == "Y":
-                if x == 0:
+                if x >= 0 and x != 3 and x != 4:
                     for line in list:
                         if line[0] == user and line[1] == program:
                             line[1] = new
@@ -548,6 +327,157 @@ def infochange(list, old, new, txt):
     list = write(list, txt)
     return list
 #--------------------------------------------------------
+
+
+
+#----------------------Huang Yixuan----------------------
+#load coaches' information from coaches.txt
+def load_coaches():
+    try:
+        with open("coaches.txt","r") as fh :
+            return[line.strip().split(",") for line in fh if line.strip()]
+    except FileNotFoundError:
+        return[]
+
+#save information to coaches.txt
+def save_coaches(coaches):
+    print("Saving coach information to file...")
+    with open("coaches.txt","w") as fh:
+        for coach in coaches:
+            fh.write(",".join(coach)+"\n")
+
+#load training information
+def load_trainings():
+    print("Loading training information...")
+    try:
+        with open("trainings.txt","r") as fh :
+            return[line.strip().split(",") for line in fh if line.strip()]
+    except FileNotFoundError:
+        return[]
+
+#save to trainings.txt
+def save_trainings(trainings):
+    print("Saving training information to file...")
+    with open("trainings.txt","w") as fh:
+        for training in trainings:
+            fh.write(",".join(training)+"\n")
+
+#save but contain original data
+def add_training_to_file(new_training):
+    trainings = load_trainings()
+    trainings.append(new_training)
+    save_trainings(trainings)
+
+#add training courses
+def add_training(coach_username):
+    print("Adding training course...")
+    trainings = load_trainings()
+    training_name = input("Please enter the course name: ")
+    charges = input("Please enter the course charges: ")
+    schedule = input("Please enter the course schedule: ")
+    #identification: course name + coach name
+    training_id = f"{coach_username}_{training_name}"
+    new_training = [training_id, coach_username, training_name, charges, schedule]
+    add_training_to_file(new_training)
+    print("Add the course successfully! ")
+
+#update the course
+def update_training():
+    print("Ready to update the course...")
+    trainings = load_trainings()
+    course_name = input("Please enter the course name which you want to update: ")
+    found = False
+    for i, training in enumerate(trainings):   #enumerate(sequence, [start=0])
+        if training[2] == course_name:
+            print(f"Now the course information is: {training}")
+            training[2] = input("New course name: ") or training[2]
+            training[3] = input("New charge: ") or training[3]
+            training[4] = input("New schedule: ") or training[4]
+            trainings[i] = training
+            save_trainings(trainings)
+            print("Successfully update!")
+            found = True
+            break
+    if not found:
+            print("Course not found.")
+
+#delete course
+def delete_training():
+    print("Ready to delete the course...")
+    trainings = load_trainings()
+    training_id = input("Please enter the course id which you want to delete: ")
+    for i, training in enumerate(trainings):
+        if training[0] == training_id:
+            del trainings[i]      #delete [i] in traings
+            save_trainings(trainings)
+            print("Successfully delete! ")
+            return
+    print("Course not found.")
+
+#to see the trainee's information
+def view_enrolled_trainees():
+    try:
+        with open("traineedetails.txt", "r") as fh:
+            trainees = [line.strip().split(",") for line in fh if line.strip()]
+        with open("trainprogram.txt","r") as fh:
+            programs = [line.strip().split(",") for line in fh if line.strip()]
+    except FileNotFoundError:
+        print("Trainee file not found.")
+        return
+    trainee_courses_list = []
+    for program in programs:
+        trainee_name = program[0].lower()
+        course_name = program[1]
+        trainee_courses_list.append((trainee_name, course_name))
+    if not trainees:
+        print("Trainee data not found.")
+        return
+    print("\n=== INFORMATION OF ALL TRAINEES ===")
+    print("Trainee name\tContact number\t\tIC\t\tCourse")
+    print("-"*100)
+    for trainee in trainees:
+        trainee_name = trainee[1].lower()
+        trainee_ic = trainee[2]
+        trainee_contact = trainee[4]
+        courses = []
+        for t in trainee_courses_list:
+            if t[0] == trainee_name and t[1] not in courses:
+                courses.append(t[1])
+        unique_courses = []
+        for course in courses:
+            if course not in unique_courses:
+                unique_courses.append(course)
+        unique_courses.sort()
+        course_str = ", ".join(unique_courses) if unique_courses else "none"
+        print(trainee_name,"\t",trainee_contact,"\t",trainee_ic,"\t",course_str)
+
+#update own information
+def update_profile(coach):
+    print("Updating your information...")
+    coaches = load_coaches()
+    index = coaches.index(coach)
+    print("Current information: ",coach)
+    coach[0] = input("New username: ") or coach[0]
+    coach[1] = input("New password: ") or coach[1]
+    coach[2] = input("New name: " ) or coach[2]
+    coach[3] = input("New contact email: ") or coach[3]
+    coach[index] = coach
+    save_coaches(coaches)
+    print("Update successfully.")
+
+#view all course data
+def view_all_trainings():
+    trainings = load_trainings()
+    if not trainings:
+        print("There is no training course now.")
+    print("\n=== COURSE INFORMATION ===")
+    print("Training id\t\t\tCoach\t\tCourse name\t\tCharge\tSchedule")
+    print("-"*100)
+    for training in trainings:
+        print(training[0], "\t", training[1], "\t", training[2], "\t", training[3], "\t", training[4])
+#--------------------------------------------------------
+
+
 
 #-----------------------Ng Ginny-------------------------
 def admin():
@@ -652,7 +582,7 @@ def receptionist():
                     contact = input("Please Enter Your Contact Number: ")
                     amtpaid = "0"
                     amtdue = "100"
-                    check = input(f"{username}, {password}, {name}, {program}, {ic}, {email}, {contact}, Are These Information Correct? (Y/N) (Type 0 To Cancel): ").title
+                    check = input(f"{username}, {password}, {name}, {program}, {ic}, {email}, {contact}, Are These Information Correct? (Y/N) (Type 0 To Cancel): ").title()
 
                     if check == "0":
                         regis = False
@@ -774,7 +704,8 @@ def receptionist():
                     break
 
         elif action == 5:
-            while True:
+            payrec = True
+            while payrec:
                 choice = input("Please Enter The Username Whose Payment Record You Would Like to Access? (Type 0 To Exit): ")
                 user = choice
                 cnt = 1
@@ -837,7 +768,7 @@ def receptionist():
                                 cnt = 0
                                 row = 0
                                 for cnt in range(len(userlist)):
-                                    if userlist[cnt][0] == user and userlist[cnt][1] == amounts[cnt][1]:
+                                    if userlist[cnt][0] == user and userlist[cnt][1] == amounts[row][1]:
                                         userlist[cnt][2] = amounts[row][2]
                                         row += 1
 
@@ -848,7 +779,7 @@ def receptionist():
                                 while True:
                                     action = input("Would You Like A Receipt? (Y/N): ").title()
                                     if action == "Y":
-                                        get = datetime.datetime.now()
+                                        get = datetime.now()
                                         amt = 0
                                         for amt in range(len(userlist)):
                                             if user == userlist[amt][0] and choice == userlist[amt][1]:
@@ -866,6 +797,7 @@ Total Paid: RM {userlist[amt][2]}/RM {userlist[amt][3]}
 ==================================================
 ''')
                                         loop = False
+                                        payrec = False
                                         break
 
                                     elif action == "N":
@@ -946,7 +878,7 @@ Total Paid: RM {userlist[amt][2]}/RM {userlist[amt][3]}
 
         elif action == 9:
             print("\nLogout Successfully!")
-            login()
+            main()
             break
 
         elif action == 0:
@@ -960,13 +892,44 @@ Total Paid: RM {userlist[amt][2]}/RM {userlist[amt][3]}
 
 
 #----------------------Huang Yixuan----------------------
-def coach():
-    coach = coach_login()
-    if coach:
-        coach_main_menu(coach)
-    else:
-        print("Log in failure.")
-        exit()
+def coach(username, password):
+    coaches = load_coaches()
+    coach_info = None
+    for coach in coaches:
+        if coach[0] == username and coach[1] == password:
+            coach_info = coach
+            break
+    if not coach_info:
+        print(f"Error: user not found!")
+        return
+    print("Welcome back.")
+    while True:
+        print("\n=== COACH MENU ===")
+        print("1. Add training course")
+        print("2. View all the course")
+        print("3. Update training course")
+        print("4. Delete training course")
+        print("5. View trainees list")
+        print("6. Update own profile")
+        print("7. Exit coach menu")
+        choice = input("Select the action: ")
+        if choice == "1":
+            add_training(coach_info[0])
+        elif choice == "2":
+            view_all_trainings()
+        elif choice == "3":
+            update_training()
+        elif choice == "4":
+            delete_training()
+        elif choice == "5":
+            view_enrolled_trainees()
+        elif choice == "6":
+            update_profile(coach_info)
+        elif choice == "7":
+            print("Exiting...")
+            return
+        else:
+            print("Action can not work. Please choose again.")
 #--------------------------------------------------------
 
 
@@ -1088,7 +1051,7 @@ def main():
                 receptionist()
                 exit()
             elif clearance == "c":
-                coach()
+                coach(username, password)
                 exit()
             elif clearance == "te":
                 trainee(username)
