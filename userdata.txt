@@ -1,5 +1,6 @@
 admin:admin123:Adam:a
 receptionist:recept123:Ron:r
+coach:coach123:Caine:c
 steve:steve123:Steve:te
 ryan:ryan123:Ryan:te
 katie:katie123:Katie:te
