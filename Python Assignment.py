@@ -239,13 +239,11 @@ def view_enrolled_trainees():
     except FileNotFoundError:
         print("Trainee file not found.")
         return
-    trainee_programs = {}
+    trainee_courses_list = []
     for program in programs:
         trainee_name = program[0].lower()
         course_name = program[1]
-        if trainee_name not in trainee_programs:
-            trainee_programs[trainee_name] = set()
-        trainee_programs[trainee_name].add(course_name)
+        trainee_courses_list.append((trainee_name, course_name))
     if not trainees:
         print("Trainee data not found.")
         return
@@ -256,8 +254,16 @@ def view_enrolled_trainees():
         trainee_name = trainee[1].lower()
         trainee_ic = trainee[2]
         trainee_contact = trainee[4]
-        courses = trainee_programs.get(trainee_name,set())
-        course_str = ",".join(sorted(courses))if courses else "none"
+        courses = []
+        for t in trainee_courses_list:
+            if t[0] == trainee_name and t[1] not in courses:
+                courses.append(t[1])
+        unique_courses = []
+        for course in courses:
+            if course not in unique_courses:
+                unique_courses.append(course)
+        unique_courses.sort()
+        course_str = ", ".join(unique_courses) if unique_courses else "none"
         print(trainee_name,"\t",trainee_contact,"\t",trainee_ic,"\t",course_str)
 
 #update own information
@@ -287,6 +293,33 @@ def view_all_trainings():
 
 #coach menu
 def coach_main_menu(coach):
+    while True:
+        print("\n=== COACH MENU ===")
+        print("1. Add training course")
+        print("2. Update training course")
+        print("3. Delete training course")
+        print("4. View trainees list")
+        print("5. Update own profile")
+        print("6. View all the course")
+        print("7, Log out")
+        choice = input("Select the action: ")
+        if choice == "1":
+            add_training(coach[0])
+        elif choice == "2":
+            update_training()
+        elif choice == "3":
+            delete_training()
+        elif choice == "4":
+            view_enrolled_trainees()
+        elif choice == "5":
+            update_profile(coach)
+        elif choice == "6":
+            view_all_trainings()
+        elif choice == "7":
+            print("Logging out...")
+            return
+        else:
+            print("Action can not work. Please choose again.")
     while True:
         print("\n=== COACH MENU ===")
         print("1. Add training course")
